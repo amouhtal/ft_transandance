@@ -12,16 +12,6 @@ let AppService = class AppService {
     getHello() {
         return 'Hello World!';
     }
-    googleLogin(req) {
-        if (!req.user) {
-            return 'No user from google';
-        }
-        console.log(req);
-        return {
-            message: 'User information from Intra',
-            user: req.user
-        };
-    }
 };
 AppService = __decorate([
     (0, common_1.Injectable)()

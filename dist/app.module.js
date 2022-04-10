@@ -11,17 +11,17 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const auth_module_1 = require("./auth/auth.module");
 const game_module_1 = require("./games/game.module");
-const google_strategy_1 = require("./google.strategy");
 const typeormcofig_1 = require("./typeormcofig");
 const user_module_1 = require("./user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [user_module_1.UserModule, game_module_1.gameModule, typeorm_1.TypeOrmModule.forRoot(typeormcofig_1.typeOrmConfig)],
+        imports: [user_module_1.UserModule, game_module_1.gameModule, auth_module_1.AuthModule, typeorm_1.TypeOrmModule.forRoot(typeormcofig_1.typeOrmConfig)],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, google_strategy_1.GoogleStrategy],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

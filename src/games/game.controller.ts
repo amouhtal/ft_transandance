@@ -1,12 +1,12 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { GamesDto } from "src/dto-classes/game.dto";
 import { Games } from "src/entities/game.entity";
 import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import { GamesService } from "./game.service";
-
-
+import { Request } from 'express';
 
 
 @Controller('games')
@@ -19,8 +19,10 @@ export class gamesController
     }
 
     @Get()
-    finGames()
+    @UseGuards(AuthGuard('jwt'))
+    finGames(@Req() request: Request)
     {
+        console.log("cookies : ", request.cookies);
         return this.gamesService.findAll() ;
     }
 

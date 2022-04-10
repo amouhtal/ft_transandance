@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gamesController = void 0;
 const common_1 = require("@nestjs/common");
+const passport_1 = require("@nestjs/passport");
 const typeorm_1 = require("@nestjs/typeorm");
 const game_dto_1 = require("../dto-classes/game.dto");
 const game_entity_1 = require("../entities/game.entity");
@@ -24,7 +25,8 @@ let gamesController = class gamesController {
         this.gamesService = gamesService;
         this.gameService = gameService;
     }
-    finGames() {
+    finGames(request) {
+        console.log("cookies : ", request.cookies);
         return this.gamesService.findAll();
     }
     getGames(gamesData) {
@@ -34,8 +36,10 @@ let gamesController = class gamesController {
 };
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], gamesController.prototype, "finGames", null);
 __decorate([

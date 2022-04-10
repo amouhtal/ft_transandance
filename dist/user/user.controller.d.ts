@@ -6,6 +6,6 @@ export declare class UserController {
     private readonly userService;
     private usersRepository;
     constructor(userService: UserService, usersRepository: Repository<User>);
-    findAllUsers(): Promise<any[]>;
+    findAllUsers(): Promise<any>;
     userUser(userData: UserDto): void;
 }

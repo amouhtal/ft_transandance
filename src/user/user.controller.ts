@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "src/dto-classes/user.dto";
 import { User } from "src/entities/user.entity";
@@ -15,7 +16,8 @@ export class UserController {
     {
     }
 
-    @Get() 
+    @Get('users')
+    // @UseGuards(AuthGuard('jwt'))
     findAllUsers() {
         return this.userService.findAll();
     }

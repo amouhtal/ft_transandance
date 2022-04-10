@@ -26,7 +26,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "lastName", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "userName", void 0);
 __decorate([
@@ -34,11 +34,16 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "picture", void 0);
+__decorate([
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
 User = __decorate([
-    (0, typeorm_1.Entity)('Users')
+    (0, typeorm_1.Entity)('Users'),
+    (0, typeorm_1.Unique)(["userName", "email"])
 ], User);
 exports.User = User;
 //# sourceMappingURL=user.entity.js.map

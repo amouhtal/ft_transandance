@@ -1,33 +1,48 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "src/dto-classes/user.dto";
+import { Games } from "src/entities/game.entity";
 import { User } from "src/entities/user.entity";
 import { arrayBuffer } from "stream/consumers";
 import { Repository } from "typeorm";
 
 @Injectable()
 export class UserService {
-    constructor(
-        @InjectRepository(User)
+    constructor(@InjectRepository(User)
         private usersRepository: Repository<User>,
-      ) {}
-        public async InsertUser( UserDto : UserDto) {
-            const userData = await this.usersRepository.create(UserDto);
-            await this.usersRepository.save(userData);
-            // return "Message Receiver!";
-        }
+      )
+      {
+
+      }
+      public async InsertUser( userDto : UserDto)
+      {
+            // const userData = await this.usersRepository.create(userDto);
+            // await this.usersRepository.save(userData);
+            try
+            {
+            const userData = await this.usersRepository.createQueryBuilder().insert().into('Users').values(userDto).onConflict('("id") DO NOTHING').execute();
+            
+            }
+            catch
+            {
+              return "Message Receiver!";
+            }
+      }
 
         public async findAll() {
-        const iser = await this.usersRepository.query(`select "winner_user","loser_user","Score","played_at" from "Games" where winner_user='amouhtal' or loser_user='amouhtal'`)
-        console.log(iser);  
+          /*
+          const userff = await this.usersRepository.createQueryBuilder()
+          .select('Games.winner_user').addSelect('Games.loser_user').addSelect('Games.Score').addSelect('Games.played_at')
+          .from(Games, "Games").where("Games.winner_user= :value or Games.loser_user=:value", {value: "test_username3"}).getMany();
+          
+          console.log("=>", userff);
         const bothUsers = new Array()  
 
-        iser.forEach(element => {
+        userff.forEach(element => {
           let obj ={
             winner: {
                 userName:element.winner_user,
                 image:"test",
-                      
                 score:element.Score.split("-")[0]
                 },
                 loser:{
@@ -39,7 +54,9 @@ export class UserService {
           }
           bothUsers.push(obj)
         });
-            return bothUsers;
+            return bothUsers;*/
+        return await this.usersRepository.query(`select * from Users`);
+
           }
 
 }

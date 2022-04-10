@@ -19,3 +19,8 @@
     "noFallthroughCasesInSwitch": false
   }
 }
+
+// const user = await getConnection() .createQueryBuilder() 
+// .select("user") 
+// .from(User, "user") 
+// .where("user.id = :id", { id: 1 }) .getOne();

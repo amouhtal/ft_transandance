@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserDto = void 0;
 const class_validator_1 = require("class-validator");
 const user_entity_1 = require("../entities/user.entity");
+const typeorm_1 = require("typeorm");
 class UserDto extends user_entity_1.User {
 }
 __decorate([
@@ -31,5 +32,9 @@ __decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], UserDto.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], UserDto.prototype, "picture", void 0);
 exports.UserDto = UserDto;
 //# sourceMappingURL=user.dto.js.map

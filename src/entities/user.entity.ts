@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('Users')
+@Unique(["userName", "email"])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,12 +11,16 @@ export class User {
 
   @Column()
   lastName: string;
-
-  @Column()
+  
+  
+  @Column({unique : true})
   userName: string;
-
+  
   @Column()
   email: string;
+  
+  @Column()
+  picture : string
 
   @Column({ default: true })
   isActive: boolean;

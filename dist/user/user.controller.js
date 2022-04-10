@@ -33,7 +33,7 @@ let UserController = class UserController {
     }
 };
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('users'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)

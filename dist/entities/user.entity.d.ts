@@ -4,5 +4,6 @@ export declare class User {
     lastName: string;
     userName: string;
     email: string;
+    picture: string;
     isActive: boolean;
 }

@@ -21,31 +21,16 @@ let UserService = class UserService {
     constructor(usersRepository) {
         this.usersRepository = usersRepository;
     }
-    async InsertUser(UserDto) {
-        const userData = await this.usersRepository.create(UserDto);
-        await this.usersRepository.save(userData);
+    async InsertUser(userDto) {
+        try {
+            const userData = await this.usersRepository.createQueryBuilder().insert().into('Users').values(userDto).onConflict('("id") DO NOTHING').execute();
+        }
+        catch (_a) {
+            return "Message Receiver!";
+        }
     }
     async findAll() {
-        const iser = await this.usersRepository.query(`select "winner_user","loser_user","Score","played_at" from "Games" where winner_user='amouhtal' or loser_user='amouhtal'`);
-        console.log(iser);
-        const bothUsers = new Array();
-        iser.forEach(element => {
-            let obj = {
-                winner: {
-                    userName: element.winner_user,
-                    image: "test",
-                    score: element.Score.split("-")[0]
-                },
-                loser: {
-                    userName: element.loser_user,
-                    image: "test",
-                    score: element.Score.split("-")[1]
-                },
-                date: element.played_at
-            };
-            bothUsers.push(obj);
-        });
-        return bothUsers;
+        return await this.usersRepository.query(`select * from Users`);
     }
 };
 UserService = __decorate([

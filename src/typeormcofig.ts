@@ -6,7 +6,7 @@ import { User } from "./entities/user.entity";
 
 export const typeOrmConfig : TypeOrmModuleOptions = {
     type: "postgres",
-    host: 'localhost',
+    host: '192.168.99.100',
     port: 5432,
     username: 'postgres',
     password: 'postgres',
