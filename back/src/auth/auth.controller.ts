@@ -1,11 +1,11 @@
-import { Controller, Get, HttpStatus, Post, Redirect, Req, Res, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpStatus, Ip, Redirect, Req, Res, UseGuards, Header, Body } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { InjectRepository } from "@nestjs/typeorm";
 import { Response } from "express";
-import { User } from "src/entities/user.entity";
-import { Repository } from "typeorm";
 import { AuthService } from "./auth.service";
-
+import RefreshTokenDto from "./dto/refresh-token.dto";
+import { RefreshToken } from "./entities/refresh-token.entity";
+const cookie = require('fastify-cookie')
+let tes: any;
 
 @Controller('auth/42')
 export class AuthController {
@@ -14,35 +14,47 @@ export class AuthController {
     
   }
 
+  
   @Get()
   @UseGuards(AuthGuard('42'))
-  async googleAuth(@Req() req) {}
-
-  @Redirect()
-  @Get('callback')
-  @UseGuards(AuthGuard('42'))
-  async asyncgoogleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
-    //  console.log(this.authService.googleLogin(req));
-    
-  //   const userInfo:any = await this.authService.googleLogin(req);
-  //   const token = userInfo.token;
-  //   // console.log(token);
-    
-  // //  response.cookie('access_token2', token);
-  //   //   response.cookie('access_token', token, {
-  //   //   httpOnly: true
-  //   // })
-  //   // response.setHeader('Set-Cookie', token)
-  //   // response.setHeader('Authorization', 'Bearer ' + token);
-  //   // console.log(userInfo);
-  //   // return {userInfo };
-
-  //   return {userInfo, statusCode: HttpStatus.TEMPORARY_REDIRECT, url: 'http://localhost:3000/' };
+  async googleAuth(@Req() req) {
+    return tes
   }
 
-  // @Post('hello')
-  // // @UseGuards(AuthGuard('jwt'))
-  // devices(): string {
-  //   return 'Hello World';
-  // }
+  // @Redirect()
+  @Get('callback')
+  // @Redirect('http://localhost:3000/', 302)
+  @UseGuards(AuthGuard('42'))
+  async asyncgoogleAuthRedirect(@Req() req, @Res() response: Response, @Ip() ip) {
+    //  console.log(req.user);
+     try
+     {
+
+       let info =  await this.authService.Login(req, response, {ipAddress: ip});
+      let tr : boolean =  await this.authService.cheskUser(req);
+      //  console.log(info)
+       response.cookie('token', info);
+       if(tr)
+        return response.redirect('http://127.0.0.1:3000');
+      return response.redirect('http://127.0.0.1:3000/games');
+      
+      }
+     catch (e)
+     {
+      //  console.log(e);
+     }
+    // if (this.authService.cheskUserName(req))
+    //   return response.redirect('http://127.0.0.1:3001');
+    // else
+
+    // req.user.email
+  }
+
+
+  
+  @Get('refresh')
+  async refreshToken(@Body() body: RefreshTokenDto) {
+    return this.authService.refresh(body.refreshToken);
+  }
+
 }

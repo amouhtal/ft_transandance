@@ -1,26 +1,27 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-42';
 // import { UserDto } from "src/dto-classes/user.dto";
+import { sign, verify } from 'jsonwebtoken';
 
 import { config } from 'dotenv';
 
-import { HttpException, Injectable, Res } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import { UserDto } from 'src/dto-classes/user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
-import { appendFile } from 'fs';
-import { JwtService } from '@nestjs/jwt';
+import { Connection, Repository } from 'typeorm';
+import { RefreshToken } from "./entities/refresh-token.entity";
 import { response } from 'express';
 
-config();
 
+config();
 @Injectable()
 export class AuthService extends PassportStrategy(Strategy, '42') {
 
   constructor( @InjectRepository(User)
-  private usersRepository: Repository<User>
-  ,private jwtService: JwtService)
+  private usersRepository: Repository<User>,
+  @InjectRepository(RefreshToken) private tokenRepository: Repository<RefreshToken>
+  )
   {
     super({
       clientID: process.env.CLIENTID,
@@ -41,7 +42,9 @@ export class AuthService extends PassportStrategy(Strategy, '42') {
   }
 
   async validate (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
+    
     const { name, emails, photos } = profile
+
     const user = {
       email: emails[0].value,
       firstName: name.givenName,
@@ -51,17 +54,97 @@ export class AuthService extends PassportStrategy(Strategy, '42') {
     }
     done(null, user);
   }
-  async googleLogin(req) {
+
+  private retrieveRefreshToken(
+    refreshStr: string,
+  ): Promise<RefreshToken | undefined> {
+    try {
+
+      const decoded = verify(refreshStr, process.env.REFRESH_SECRET);
+      if (typeof decoded === 'string') {
+        return undefined;
+      }
+      // const rr = this.refreshTokens.find((token) => token.id === decoded.id);
+      let id : number = decoded.id;
+
+      this.ReftokenRepository.findOne({id});
+
+      return Promise.resolve(
+        // this.refreshTokens.find((token) => token.id === decoded.id),
+      this.ReftokenRepository.findOne({id})
+        
+        );
+      } catch (e) {
+        console.log(e.message)
+      return undefined;
+    }
+  }
+
+   async newRefreshAndAccessToken(
+    user: User,
+    values: { ipAddress: string },
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+
+    const refreshObject = new RefreshToken()
+    refreshObject.email = user.email;
+    refreshObject.ipAddress = values.ipAddress;
+    refreshObject.userAgent = "testtest"
+    this.tokenRepository.save(refreshObject);
+
+    return {
+      refreshToken: refreshObject.sign(),
+      accessToken: sign(
+        {
+          userId: user.email,
+        },
+        process.env.ACCESS_SECRET,
+        {
+          expiresIn: '1h',
+        },
+      ),
+    };
+  }
+
+  async refresh(refreshStr: string): Promise<string | undefined> {
+    const refreshToken = await this.retrieveRefreshToken(refreshStr);
+    if (!refreshToken) {
+      return undefined;
+    }
+    const user = await this.userService.findOne(refreshToken.email);
+    if (!user) {
+      return undefined;
+    }
+
+    const accessToken = {
+      userId: refreshToken.email,
+    };
+
+    return sign(accessToken, process.env.ACCESS_SECRET, { expiresIn: '1h' });
+  }
+
+  async cheskUser(req) : Promise<boolean>
+  {
+     let exist = await this.usersRepository.find({
+      where: {
+        email: req.user.email,
+        
+      },
+       })
+      if (!exist[0].userName || exist)
+        return false;
+      return true;
+  }
+
+  async Login(req, res,values : {ipAddress: string}) {
     if (!req.user) {
       return 'No user from google';
     }
-
+  
+    // const userId = req.user.email;
     
-    const userId = req.user.email;
     
-    
-    const payload = { userId: userId };
-    const token = this.jwtService.sign(payload);;
+    // const payload = { userId: userId };
+    // const token = this.jwtService.sign(payload);;
     // const token = this.jwtService.sign(payload);
     
     // response.cookie('access_token', token, {
@@ -76,20 +159,23 @@ export class AuthService extends PassportStrategy(Strategy, '42') {
     userDto.lastName = req.user.lastName;
     userDto.picture = req.user.picture;
     userDto.isActive = true;
-    userDto.userName = "test_username*118";
-   
+    if (this.cheskUser(req))
+      userDto.userName = req.user.userName;
 
-      // await this.usersRepository.createQueryBuilder().insert().into('Users').values(userDto).onConflict('("userName") DO NOTHING').execute();
-      // console.log(userDto);
 
-    // await this.usersRepository.save(userDto);
+
+        // console.log(userDto);
+        if (!this.cheskUser(req))
+        {
+          console.log("hereeeee");
+          await this.usersRepository.save(userDto);
+
+        }
 
     //  insert into "Users" (id,"firstName","lastName", "userName","email") values (9,'ftest', 'lname', 'username', 'etest');
     // const iser = await this.usersRepository.query(`insert into Users 'winner_user,"loser_user","Score","played_at" from "Games" where winner_user='amouhtal' or loser_user='amouhtal'`);
+    // let info = this.newRefreshAndAccessToken(userDto, values)
 
-    return {
-      message: 'User information from Intra',
-      user: req.user,
-      token : token }
+    return  this.newRefreshAndAccessToken(userDto, values);
   }
 }

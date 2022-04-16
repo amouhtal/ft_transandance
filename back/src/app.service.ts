@@ -1,10 +1,12 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { Injectable, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from "express";
 
 @Injectable()
 export class AppService {
   
-  getHello(): string {
-    return 'Hello World!';
+  getHello() {
+
+    // return 'Hello World!';
   }
 }

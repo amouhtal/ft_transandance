@@ -1,4 +1,4 @@
-import { Controller, Module } from "@nestjs/common";
+import {  Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Games } from "src/entities/game.entity";
 import { gamesController } from "./game.controller";

@@ -7,6 +7,7 @@ import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import { GamesService } from "./game.service";
 import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.gguard';
 
 
 @Controller('games')
@@ -19,14 +20,17 @@ export class gamesController
     }
 
     @Get()
-    @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
     finGames(@Req() request: Request)
     {
-        console.log("cookies : ", request.cookies);
+        // console.log("cookies : ", request.cookies);
         return this.gamesService.findAll() ;
     }
 
     @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
+
     getGames(
         @Body() gamesData: GamesDto
     )
