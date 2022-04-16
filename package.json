@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "cookiecutter": "^1.3.0"
+  }
+}
